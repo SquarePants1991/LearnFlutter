@@ -11,6 +11,10 @@ IOSSurfaceGL （OpenGL，通过Skia的GrGLGpu渲染） 和 IOSSurfaceSoftware �
 # 动画
 
 # 使用dart:ui自定义组件
+可以绘制基本图形，直接使用不同的blendMode绘制颜色，绘制2d顶点数组（不支持深度缓冲，估计不能支持3D数组绘制）
+可以深入了解下关于shader和paint
+todo:
+* 实现歌词组件
 
 # 使用Texture自定义组件
 CVPixelBuffer 需要使用pow of 2 尺寸, 比如1024， 512 。。。
