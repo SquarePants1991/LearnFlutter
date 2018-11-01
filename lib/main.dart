@@ -6,6 +6,7 @@ import 'examples/basic_widget_screen.dart';
 import 'examples/bottom_navbar_screen.dart';
 import 'examples/tabbar_screen.dart';
 import 'examples/paint_screen.dart';
+import 'examples/simple_animation_screen.dart';
 
 void main() {
   return runApp(MaterialApp(
@@ -24,6 +25,7 @@ class LearnFlutter extends StatelessWidget {
   TutorialEntry(title: "BottomNavBar结构", screen: () => BottomNavBarScreen()),
   TutorialEntry(title: "TabBar结构", screen: () => TabBarScreen()),
   TutorialEntry(title: "自定义绘制", screen: () => PaintScreen()),
+  TutorialEntry(title: "简单动画", screen: () => SimpleAnimationScreen()),
   ];
 
   @override
