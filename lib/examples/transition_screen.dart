@@ -54,22 +54,50 @@ class TransitionScreenState extends State<TransitionScreen> with SingleTickerPro
                 height: 100,
               ),
             ),
-            Stack(
-                children: <Widget>[
-                  PositionedTransition(
-                    rect: RelativeRectTween(
-                      begin: RelativeRect.fromSize(Rect.fromLTWH(0, 0, 100, 100), Size(100, 100)),
-                      end: RelativeRect.fromSize(Rect.fromLTWH(0, 0, 100, 100), Size(4, 4)),
-                    ).animate(_animationController),
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: Colors.yellow
+            Container(
+              height: 200,
+              width: 200,
+              child: Stack(
+                  children: <Widget>[
+                    PositionedTransition(
+                      rect: RelativeRectTween(
+                        begin: RelativeRect.fromRect(
+                          Rect.fromLTWH(10, 10, 100, 100),
+                          Rect.fromLTRB(0.0, 0.0, 200.0, 200.0),
+                        ),
+                        end: RelativeRect.fromRect(
+                          Rect.fromLTWH(50, 50, 140, 140),
+                          Rect.fromLTRB(0.0, 00.0, 200.0, 200.0),
+                        )
+                      ).animate(_animationController),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.yellow
+                        )
                       ),
-                      width: 100,
-                      height: 100,
-                    ),
-                  )
-                ])
+                    )
+                  ])
+            ),
+            RotationTransition(
+              turns: _animationController,
+              child: Container(
+                decoration: BoxDecoration(
+                    color: Colors.cyan
+                ),
+                width: 40,
+                height: 40,
+              ),
+            ),
+            ScaleTransition(
+              scale: _animationController,
+              child: Container(
+                decoration: BoxDecoration(
+                    color: Colors.cyan
+                ),
+                width: 40,
+                height: 40,
+              ),
+            ),
           ]),
     );
   }
