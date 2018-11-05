@@ -90,21 +90,23 @@ class SnakePainter extends ChangeNotifier implements CustomPainter {
     final paint = Paint();
     paint.color = Colors.red;
     paint.style = PaintingStyle.fill;
+    paint.strokeWidth = 5;
 
-//    final path = Path();
-//    Offset head = snakeData.snakeCorners.last;
+    final path = Path();
+    var smoothLine = _smoothLine(snakeData.snakeCorners);
+//    Offset head = smoothLine.last;
 //    path.moveTo(head.dx, head.dy);
-//    for (var pt in snakeData.snakeCorners.reversed) {
+//    for (var pt in smoothLine.reversed) {
 //      path.lineTo(pt.dx, pt.dy);
 //    }
 //    canvas.drawPath(path, paint);
 
-    const snakeWidth = 80.0;
+    const snakeWidth = 10.0;
     const snakeHeadLen = 10.0;
 
     List<Offset> positions = List<Offset>();
     // snake header
-    final headPos = snakeData.snakeCorners.last;
+    final headPos = smoothLine.last;
     final forwardVec = snakeData.walkDirection;
     final rightVec = _rotateOffset(snakeData.walkDirection, 90);
     positions.add(headPos + forwardVec * snakeHeadLen + rightVec * snakeWidth * 0.5);
@@ -112,39 +114,15 @@ class SnakePainter extends ChangeNotifier implements CustomPainter {
     positions.add(headPos + rightVec * snakeWidth * 0.5);
     positions.add(headPos - rightVec * snakeWidth * 0.5);
 
-    Offset lastCorner = snakeData.snakeCorners.last;
-    for (var i = snakeData.snakeCorners.length - 2; i >= 0; --i) {
-      final currentCorner = snakeData.snakeCorners[i];
-      final currentLength = (lastCorner - currentCorner).distance;
+    Offset lastCorner = smoothLine.last;
+    for (var i = smoothLine.length - 2; i >= 0; --i) {
+      final currentCorner = smoothLine[i];
       final currentForwardVec = _normalizeOffset(lastCorner - currentCorner);
       final currentRightVec = _rotateOffset(currentForwardVec, 90);
-      final currentCornerRadius = min(snakeWidth, currentLength);
-
-      if (i != 0) {
-        final nextCorner = snakeData.snakeCorners[i - 1];
-        final nextLength = (currentCorner - nextCorner).distance;
-        final nextForwardVec = _normalizeOffset(currentCorner - nextCorner);
-        final nextRightVec = _rotateOffset(nextForwardVec, 90);
-        final nextCornerRadius = min(snakeWidth, nextLength);
-
-        final middleRightVec = _normalizeOffset(nextRightVec + currentRightVec);
-        final middleCornerRadius = snakeWidth * 0.5  / sin(VecMath.degrees2Radians * 45);
-
-        positions.add(currentCorner + currentForwardVec * currentCornerRadius + currentRightVec * snakeWidth * 0.5);
-        positions.add(currentCorner + currentForwardVec * currentCornerRadius - currentRightVec * snakeWidth * 0.5);
-        positions.add(currentCorner + middleRightVec * middleCornerRadius);
-        positions.add(currentCorner - middleRightVec * middleCornerRadius);
-        positions.add(currentCorner - nextForwardVec * nextCornerRadius + nextRightVec * snakeWidth * 0.5);
-        positions.add(currentCorner - nextForwardVec * nextCornerRadius - nextRightVec * snakeWidth * 0.5);
-      } else {
-        positions.add(currentCorner + currentRightVec * snakeWidth * 0.5);
-        positions.add(currentCorner - currentRightVec * snakeWidth * 0.5);
-      }
-      lastCorner = snakeData.snakeCorners[i];
+      positions.add(currentCorner + currentRightVec * snakeWidth * 0.5);
+      positions.add(currentCorner - currentRightVec * snakeWidth * 0.5);
+      lastCorner = smoothLine[i];
     }
-
-
-
 
     List<Color> colors = List<Color>();
     for (var pos in positions) {
@@ -159,6 +137,55 @@ class SnakePainter extends ChangeNotifier implements CustomPainter {
       canvas.drawImage(bgImage, Offset(0, 0), paint);
     }
 
+  }
+
+  List<Offset> _smoothLine(List<Offset> line) {
+    if (line.length == 2) {
+      return line;
+    }
+    const cornerRadius = 20.0;
+    List<Offset> smoothLine = List();
+    for (var i = line.length - 2; i > 0; --i) {
+      final prevPt = line[i + 1];
+      final currentPt = line[i];
+      final nextPt = line[i - 1];
+
+      final prevLength = (prevPt - currentPt).distance;
+      final nextLength = (currentPt - nextPt).distance;
+      final prevVec =  _normalizeOffset(prevPt - currentPt);
+      final nextVec = _normalizeOffset(nextPt - currentPt);
+      final cornerCircleCenter = (prevVec + nextVec) * cornerRadius + currentPt;
+
+
+      var prevCircleBeginPoint= prevPt;
+      if (prevLength > cornerRadius) {
+        if (i == line.length - 2) {
+          smoothLine.add(prevPt);
+        }
+        prevCircleBeginPoint = currentPt + prevVec * cornerRadius;
+      }
+
+      var nextCircleBeginPoint= nextPt;
+      if (nextLength > cornerRadius) {
+        nextCircleBeginPoint = currentPt + nextVec * cornerRadius;
+      }
+
+      final beginVec = _normalizeOffset(prevCircleBeginPoint - cornerCircleCenter);
+      final endVec = _normalizeOffset(nextCircleBeginPoint - cornerCircleCenter);
+
+      const segments = 5;
+      for (var seg = 0; seg <= segments; ++seg) {
+        final percent = seg / segments;
+        smoothLine.add( _normalizeOffset(beginVec * (1.0 - percent) + endVec * percent) * cornerRadius + cornerCircleCenter);
+      }
+
+      if (nextLength > cornerRadius) {
+        if (i == 1) {
+          smoothLine.add(nextPt);
+        }
+      }
+    }
+    return smoothLine;
   }
 
   Offset _rotateOffset(Offset input, double degree) {
