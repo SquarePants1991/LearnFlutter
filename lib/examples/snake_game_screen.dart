@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import "dart:ui";
@@ -66,7 +68,7 @@ class SnakeData {
 class SnakePainter extends ChangeNotifier implements CustomPainter {
 
   SnakePainter({this.snakeData}) {
-    ImageLoader.loadImage("assets/icons/gem_icon.png").then((image) {
+    ImageLoader.loadImage("assets/snake_skin/redone.png").then((image) {
       bgImage = image;
     });
   }
@@ -90,6 +92,10 @@ class SnakePainter extends ChangeNotifier implements CustomPainter {
     final paint = Paint();
     paint.color = Colors.red;
     paint.style = PaintingStyle.fill;
+    Matrix4 matrix4 = Matrix4.identity();
+    List<double> matrix4Data = List(16);
+    matrix4.copyIntoArray(matrix4Data);
+    paint.shader = ImageShader(bgImage, TileMode.repeated, TileMode.repeated, Float64List.fromList(matrix4Data));
     paint.strokeWidth = 5;
 
     var smoothLine = _smoothLine(snakeData.snakeCorners);

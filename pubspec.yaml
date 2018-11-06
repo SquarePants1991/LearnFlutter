@@ -38,6 +38,7 @@ flutter:
   assets:
     - assets/icons/gem_icon.png
     - assets/icons/bubble_dialog.png
+    - assets/snake_skin/redone.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:
