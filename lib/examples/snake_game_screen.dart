@@ -92,16 +92,9 @@ class SnakePainter extends ChangeNotifier implements CustomPainter {
     paint.style = PaintingStyle.fill;
     paint.strokeWidth = 5;
 
-    final path = Path();
     var smoothLine = _smoothLine(snakeData.snakeCorners);
-//    Offset head = smoothLine.last;
-//    path.moveTo(head.dx, head.dy);
-//    for (var pt in smoothLine.reversed) {
-//      path.lineTo(pt.dx, pt.dy);
-//    }
-//    canvas.drawPath(path, paint);
 
-    const snakeWidth = 10.0;
+    const snakeWidth = 20.0;
     const snakeHeadLen = 10.0;
 
     List<Offset> positions = List<Offset>();
@@ -129,60 +122,65 @@ class SnakePainter extends ChangeNotifier implements CustomPainter {
       colors.add(Colors.red);
     }
 
-    final vertices = Vertices(VertexMode.triangleStrip, positions);
+    final vertices = Vertices(VertexMode.triangleStrip, positions, colors: colors);
     canvas.drawVertices(vertices, BlendMode.color, paint);
 
 
-    if (bgImage != null) {
-      canvas.drawImage(bgImage, Offset(0, 0), paint);
-    }
-
+//    paint.color = Colors.green;
+//    paint.style = PaintingStyle.stroke;
+//    paint.strokeWidth = 5;
+//    final path = Path();
+//    Offset head = smoothLine.last;
+//    path.moveTo(head.dx, head.dy);
+//    for (var pt in smoothLine.reversed) {
+//      path.lineTo(pt.dx, pt.dy);
+//    }
+//    canvas.drawPath(path, paint);
   }
 
   List<Offset> _smoothLine(List<Offset> line) {
     if (line.length == 2) {
       return line;
     }
-    const cornerRadius = 20.0;
+    const cornerRadiusMax = 20.0;
     List<Offset> smoothLine = List();
-    for (var i = line.length - 2; i > 0; --i) {
+    for (var i = line.length - 2; i >= 0; --i) {
       final prevPt = line[i + 1];
       final currentPt = line[i];
-      final nextPt = line[i - 1];
 
       final prevLength = (prevPt - currentPt).distance;
-      final nextLength = (currentPt - nextPt).distance;
       final prevVec =  _normalizeOffset(prevPt - currentPt);
-      final nextVec = _normalizeOffset(nextPt - currentPt);
-      final cornerCircleCenter = (prevVec + nextVec) * cornerRadius + currentPt;
 
+      if (i > 0) {
+        final nextPt = i > 0 ? line[i - 1] : null;
+        final nextLength = (currentPt - nextPt).distance;
+        final nextVec = i > 0 ? _normalizeOffset(nextPt - currentPt) : null;
 
-      var prevCircleBeginPoint= prevPt;
-      if (prevLength > cornerRadius) {
-        if (i == line.length - 2) {
-          smoothLine.add(prevPt);
+        double cornerRadius = max(1.0, min(prevLength, min(cornerRadiusMax, nextLength)));
+        final cornerCircleCenter = (prevVec + nextVec) * cornerRadius + currentPt;
+        var prevCircleBeginPoint= prevPt;
+        if (prevLength > cornerRadius) {
+          if (i == line.length - 2) {
+            smoothLine.insert(0, prevPt);
+          }
+          prevCircleBeginPoint = currentPt + prevVec * cornerRadius;
         }
-        prevCircleBeginPoint = currentPt + prevVec * cornerRadius;
-      }
 
-      var nextCircleBeginPoint= nextPt;
-      if (nextLength > cornerRadius) {
-        nextCircleBeginPoint = currentPt + nextVec * cornerRadius;
-      }
-
-      final beginVec = _normalizeOffset(prevCircleBeginPoint - cornerCircleCenter);
-      final endVec = _normalizeOffset(nextCircleBeginPoint - cornerCircleCenter);
-
-      const segments = 5;
-      for (var seg = 0; seg <= segments; ++seg) {
-        final percent = seg / segments;
-        smoothLine.add( _normalizeOffset(beginVec * (1.0 - percent) + endVec * percent) * cornerRadius + cornerCircleCenter);
-      }
-
-      if (nextLength > cornerRadius) {
-        if (i == 1) {
-          smoothLine.add(nextPt);
+        var nextCircleBeginPoint= nextPt;
+        if (nextLength > cornerRadius) {
+          nextCircleBeginPoint = currentPt + nextVec * cornerRadius;
         }
+
+        final beginVec = _normalizeOffset(prevCircleBeginPoint - cornerCircleCenter);
+        final endVec = _normalizeOffset(nextCircleBeginPoint - cornerCircleCenter);
+
+        const segments = 5;
+        for (var seg = 0; seg <= segments; ++seg) {
+          final percent = seg / segments;
+          smoothLine.insert(0, _normalizeOffset(beginVec * (1.0 - percent) + endVec * percent) * cornerRadius + cornerCircleCenter);
+        }
+      } else {
+        smoothLine.insert(0, currentPt);
       }
     }
     return smoothLine;
@@ -199,6 +197,9 @@ class SnakePainter extends ChangeNotifier implements CustomPainter {
 
   Offset _normalizeOffset(Offset input) {
     final distance = input.distance;
+    if (distance == 0) {
+      return Offset(0, 0);
+    }
     return input / distance;
   }
 
