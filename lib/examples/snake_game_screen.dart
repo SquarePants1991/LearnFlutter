@@ -87,16 +87,23 @@ class SnakePainter extends ChangeNotifier implements CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    if (bgImage == null) {
+      return;
+    }
     canvas.drawColor(Color.fromARGB(0, 0, 0, 0), BlendMode.color);
 
     final paint = Paint();
-    paint.color = Colors.red;
+//    paint.color = Colors.red;
     paint.style = PaintingStyle.fill;
+//    paint.shader = LinearGradient(colors: <Color>[
+//      Colors.orange,
+//      Colors.green
+//    ]).createShader(Rect.fromLTWH(0, 0, 1,1));
     Matrix4 matrix4 = Matrix4.identity();
     List<double> matrix4Data = List(16);
     matrix4.copyIntoArray(matrix4Data);
     paint.shader = ImageShader(bgImage, TileMode.repeated, TileMode.repeated, Float64List.fromList(matrix4Data));
-    paint.strokeWidth = 5;
+//    paint.strokeWidth = 5;
 
     var smoothLine = _smoothLine(snakeData.snakeCorners);
 
@@ -123,12 +130,23 @@ class SnakePainter extends ChangeNotifier implements CustomPainter {
       lastCorner = smoothLine[i];
     }
 
-    List<Color> colors = List<Color>();
+    List<Offset> texcoords = List<Offset>();
+    var index = 0;
     for (var pos in positions) {
-      colors.add(Colors.red);
+      final groupIndex = index % 4;
+      if (groupIndex == 0) {
+        texcoords.add(Offset(128, 0));
+      } else if (groupIndex == 1) {
+        texcoords.add(Offset(0, 0));
+      } else if (groupIndex == 2) {
+        texcoords.add(Offset(128, 128));
+      } else if (groupIndex == 3) {
+        texcoords.add(Offset(0, 128));
+      }
+      index++;
     }
 
-    final vertices = Vertices(VertexMode.triangleStrip, positions, colors: colors);
+    final vertices = Vertices(VertexMode.triangleStrip, positions, textureCoordinates: texcoords);
     canvas.drawVertices(vertices, BlendMode.color, paint);
 
 
