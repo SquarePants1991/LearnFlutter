@@ -11,6 +11,8 @@ import 'examples/hero_animation_screen.dart';
 import 'examples/animation_builder_screen.dart';
 import 'examples/transition_screen.dart';
 import 'examples/snake_game_screen.dart';
+import 'examples/scroll_screen.dart';
+import 'examples/complex_scroll_screen.dart';
 
 void main() {
   return runApp(MaterialApp(
@@ -34,6 +36,8 @@ class LearnFlutter extends StatelessWidget {
   TutorialEntry(title: "Animation Builder动画", screen: () => AnimationBuilderScreen()),
   TutorialEntry(title: "Transition动画", screen: () => TransitionScreen()),
   TutorialEntry(title: "Snake Game", screen: () => SnakeGameScreen()),
+  TutorialEntry(title: "Scroll View", screen: () => ScrollScreen()),
+  TutorialEntry(title: "复杂Scroll View", screen: () => ComplexScrollScreen()),
   ];
 
   @override
