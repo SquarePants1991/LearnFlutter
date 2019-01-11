@@ -3,7 +3,6 @@ import "dart:ui";
 import "dart:typed_data";
 
 class ShapePainter extends CustomPainter {
-
   @override
   bool shouldRepaint(CustomPainter oldDelegate) {
     return true;
@@ -22,12 +21,11 @@ class ShapePainter extends CustomPainter {
 
     painter.color = Colors.green;
     painter.style = PaintingStyle.fill;
-    canvas.drawCircle(Offset(50,50), 40, painter);
+    canvas.drawCircle(Offset(50, 50), 40, painter);
     painter.style = PaintingStyle.stroke;
     painter.strokeWidth = 4;
     painter.color = Colors.orange;
-    canvas.drawCircle(Offset(50,50), 40, painter);
-
+    canvas.drawCircle(Offset(50, 50), 40, painter);
 
     painter.style = PaintingStyle.stroke;
     final path = Path();
@@ -37,22 +35,15 @@ class ShapePainter extends CustomPainter {
     path.lineTo(100, 160);
     canvas.drawPath(path, painter);
 
-
     final positions = <Offset>[
       Offset(140, 140),
       Offset(100, 180),
       Offset(180, 180)
     ];
-    final colors = <Color>[
-      Colors.red,
-      Colors.green,
-      Colors.yellow
-    ];
-    final vertices = Vertices(VertexMode.triangles,
-        positions.toList(),
-    colors: colors);
+    final colors = <Color>[Colors.red, Colors.green, Colors.yellow];
+    final vertices =
+        Vertices(VertexMode.triangles, positions.toList(), colors: colors);
     canvas.drawVertices(vertices, BlendMode.color, painter);
-
   }
 }
 
@@ -60,18 +51,13 @@ class PaintScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("自定义绘图"),
-      ),
-      body: Container(
-        alignment: Alignment.center,
-        child:  CustomPaint(
-          size: Size.fromHeight(400),
-            painter: ShapePainter()
+        appBar: AppBar(
+          title: Text("自定义绘图"),
         ),
-      )
-
-
-    );
+        body: Container(
+          alignment: Alignment.center,
+          child:
+              CustomPaint(size: Size.fromHeight(400), painter: ShapePainter()),
+        ));
   }
 }

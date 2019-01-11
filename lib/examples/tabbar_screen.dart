@@ -45,7 +45,6 @@ class TabBarScreenState extends State<TabBarScreen> with SingleTickerProviderSta
                 indicatorColor: Colors.amber,
                 unselectedLabelColor: Colors.black26),
           ), preferredSize: Size.fromHeight(44))
-          
         ),
         body: TabBarView(children: _contents, controller: _tabController),
       drawer: Row(children: <Widget>[
